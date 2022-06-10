@@ -23,22 +23,16 @@ def predict(vectoriser, model, text):
     textdata = vectoriser.transform(preprocess(text))
     sentiment = model.predict(textdata)
     
-    # Make a list of text with sentiment.
-    data = []
-    for text, pred in zip(text, sentiment):
-        data.append((text,pred))
-        
-    # Convert the list into a Pandas DataFrame.
-    df = pd.DataFrame(data, columns = ['text','sentiment'])
-    df = df.replace([0,1], ["Negative","Positive"])
-    return df
+    return sentiment
 
 if __name__=="__main__":
     # Loading the models.
     #vectoriser, LRmodel = load_models()
     
     # Text to classify should be in a list.
-    text = list(map(str,input().split('/')))
+    text = st.text_input()
     
-    df = predict(vectoriser, SVCmodel, text)
-    print(df.head())
+    
+    df = predict(vectoriser, SVCmodel, [text])
+    if df == 1: st.write("Positive")
+    else: st.write('Negative')
