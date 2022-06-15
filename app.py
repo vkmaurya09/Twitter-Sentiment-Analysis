@@ -1,6 +1,7 @@
 import streamlit as st
 import pickle
-
+from preprocessing import preprocess
+from nltk.stem import WordNetLemmatizer
 
 def load_models():
     '''
@@ -8,11 +9,11 @@ def load_models():
     '''
     
     # Load the vectoriser.
-    file = open('..path/vectoriser-ngram-(1,2).pickle', 'rb')
+    file = open('vectoriser_1_2.pickle', 'rb')
     vectoriser = pickle.load(file)
     file.close()
     # Load the LR Model.
-    file = open('..path/Sentiment-LRv1.pickle', 'rb')
+    file = open('Sentiment-Svm.pickle', 'rb')
     LRmodel = pickle.load(file)
     file.close()
     
@@ -20,19 +21,28 @@ def load_models():
 
 def predict(vectoriser, model, text):
     # Predict the sentiment
-    textdata = vectoriser.transform(preprocess(text))
+    clean_text = preprocess(text)
+    if clean_text=='':
+        return "There is no proper text" 
+    textdata = vectoriser.transform(clean_text)
     sentiment = model.predict(textdata)
+    # return sentiment
+    # print(sentiment)
+    result  = "Positive" if sentiment==1 else "Negative"
     
-    return sentiment
+    return result
 
 if __name__=="__main__":
     # Loading the models.
-    #vectoriser, LRmodel = load_models()
+    vectoriser, LRmodel = load_models()
     
     # Text to classify should be in a list.
-    text = st.text_input()
+    # text = st.text_input('Enter Text')
     
-    
-    df = predict(vectoriser, SVCmodel, [text])
-    if df == 1: st.write("Positive")
-    else: st.write('Negative')
+
+    form = st.form(key='my-form')
+    text = form.text_input("Enter Text")
+    submit = form.form_submit_button("Submit")
+    if submit:
+        result = predict(vectoriser, LRmodel, [text])
+        st.write(f"Model Predicted : {result}")
