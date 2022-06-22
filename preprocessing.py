@@ -1,4 +1,5 @@
 import nltk
+nltk.download()
 from nltk.stem import WordNetLemmatizer
 import re
 # Defining dictionary containing all emojis with their meanings.
